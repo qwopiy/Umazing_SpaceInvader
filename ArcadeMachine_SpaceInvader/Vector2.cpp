@@ -15,6 +15,10 @@ Vector2::Vector2() {
 	this->y = 0.0f;
 }
 
+Vector3 Vector2::toVector3() {
+	return Vector3(this->x, this->y, 0.0f);
+}
+
 void Vector2::toGLVertex2f() {
 	glVertex2f(this->x, this->y);
 }
