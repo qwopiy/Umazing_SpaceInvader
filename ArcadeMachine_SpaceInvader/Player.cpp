@@ -62,16 +62,16 @@ void Player::draw() {
 
 	glBegin(GL_QUADS);
 	glColor3f(0, 1, 0);
-	glVertex3f(a.x, a.y, a.z);
-	glVertex3f(b.x, b.y, b.z);
-	glVertex3f(c.x, c.y, c.z);
-	glVertex3f(d.x, d.y, d.z);
+	a.toGLVertex3f();
+	b.toGLVertex3f();
+	c.toGLVertex3f();
+	d.toGLVertex3f();
 	glEnd();
 
 	glBegin(GL_TRIANGLES);
 	glColor3f(0, 1, 0);
-	glVertex3f(pA.x, pA.y, pA.z);
-	glVertex3f(pB.x, pB.y, pB.z);
-	glVertex3f(pC.x, pC.y, pC.z);
+	pA.toGLVertex3f();
+	pB.toGLVertex3f();
+	pC.toGLVertex3f();
 	glEnd();
 }

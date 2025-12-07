@@ -16,3 +16,17 @@ Vector3::Vector3() {
 	this->y = 0.0f;
 	this->z = 0.0f;
 }
+
+void Vector3::toGLVertex2f() {
+	glVertex2f(this->x, this->y);
+}
+void Vector3::toGLVertex3f() {
+	glVertex3f(this->x, this->y, this->z);
+}
+
+void Vector3::Vertex2f(Vector3 v) {
+	glVertex2f(v.x, v.y);
+}
+void Vector3::Vertex3f(Vector3 v) {
+	glVertex3f(v.x, v.y, v.z);
+}

@@ -15,9 +15,9 @@ void GameScreen::draw() {
 	glBegin(GL_QUADS);
 
 	glColor3f(0, 0, 0);
-	glVertex3f(a.x, a.y, a.z);
-	glVertex3f(b.x, b.y, b.z);
-	glVertex3f(c.x, c.y, c.z);
-	glVertex3f(d.x, d.y, d.z);
+	a.toGLVertex3f();
+	b.toGLVertex3f();
+	c.toGLVertex3f();
+	d.toGLVertex3f();
 	glEnd();
 }
