@@ -1,8 +1,8 @@
-#include "Vector2.h"
 #include "Vector3.h"
 #include "GameScreen.h"
 #include "Player.h"
 #include "PlayerBullet.h"
+#include "Enemy.h"
 #include <glut.h>
 #include <vector>
 #include <iostream>
@@ -17,11 +17,29 @@ float angleZ = 0.0f;
 GameScreen gameScreen;
 Player player;
 vector<PlayerBullet> playerBullets; 
+vector<Enemy> enemies;
 
 float deltaTime = 0.0f;
 float oldTimeSinceStart = 0.0f;
+float timeElapsed = 0.0f;
+float enemyMoveInterval = 1.0f;
 
-void drawCube() {
+void initEnemies() {
+    float startY = 0.7f;
+    float spacingY = 0.2f;
+    float startX = -0.8f;
+    float spacingX = 0.3f;
+    int rows = 3;
+    int cols = 5;
+    for (int i = 0; i < rows; ++i) {
+        for (int j = 0; j < cols; ++j) {
+            Vector3 enemyPos = Vector3(startX + j * spacingX, startY - i * spacingY, 1.01f);
+            enemies.push_back(Enemy(enemyPos, 0.1f, 0.1f));
+        }
+    }
+}
+
+void draw() {
 	gameScreen.draw();
 	player.draw();
     if (!playerBullets.empty()) {
@@ -30,50 +48,57 @@ void drawCube() {
             pb.draw();
         }
     }
+    if (!enemies.empty()) {
+        for (Enemy& enemy : enemies)
+        {
+            enemy.draw();
+        }
+    }
+
 
     glBegin(GL_QUADS);
 
     //// MERAH 
     //glColor3f(1, 0, 0);
-    //glVertex3f(-0.5, -0.5, 0.5);
-    //glVertex3f(0.5, -0.5, 0.5);
-    //glVertex3f(0.5, 0.5, 0.5);
-    //glVertex3f(-0.5, 0.5, 0.5);
+    //glVertex3f(-1, -1, 1);
+    //glVertex3f(1, -1, 1);
+    //glVertex3f(1, 1, 1);
+    //glVertex3f(-1, 1, 1);
 
     // HIJAU
     glColor3f(0, 1, 0);
-    glVertex3f(-0.5, -0.5, -0.5);
-    glVertex3f(0.5, -0.5, -0.5);
-    glVertex3f(0.5, 0.5, -0.5);
-    glVertex3f(-0.5, 0.5, -0.5);
+    glVertex3f(-1, -1, -1);
+    glVertex3f(1, -1, -1);
+    glVertex3f(1, 1, -1);
+    glVertex3f(-1, 1, -1);
 
     // BIRU
     glColor3f(0, 0, 1);
-    glVertex3f(-0.5, -0.5, -0.5);
-    glVertex3f(-0.5, -0.5, 0.5);
-    glVertex3f(-0.5, 0.5, 0.5);
-    glVertex3f(-0.5, 0.5, -0.5);
+    glVertex3f(-1, -1, -1);
+    glVertex3f(-1, -1, 1);
+    glVertex3f(-1, 1, 1);
+    glVertex3f(-1, 1, -1);
 
     //KUNING
     glColor3f(1, 1, 0);
-    glVertex3f(0.5, -0.5, -0.5);
-    glVertex3f(0.5, -0.5, 0.5);
-    glVertex3f(0.5, 0.5, 0.5);
-    glVertex3f(0.5, 0.5, -0.5);
+    glVertex3f(1, -1, -1);
+    glVertex3f(1, -1, 1);
+    glVertex3f(1, 1, 1);
+    glVertex3f(1, 1, -1);
 
     // MAGENTA
     glColor3f(1, 0, 1);
-    glVertex3f(-0.5, 0.5, 0.5);
-    glVertex3f(0.5, 0.5, 0.5);
-    glVertex3f(0.5, 0.5, -0.5);
-    glVertex3f(-0.5, 0.5, -0.5);
+    glVertex3f(-1, 1, 1);
+    glVertex3f(1, 1, 1);
+    glVertex3f(1, 1, -1);
+    glVertex3f(-1, 1, -1);
 
     // CYAN
     glColor3f(0, 1, 1);
-    glVertex3f(-0.5, -0.5, 0.5);
-    glVertex3f(0.5, -0.5, 0.5);
-    glVertex3f(0.5, -0.5, -0.5);
-    glVertex3f(-0.5, -0.5, -0.5);
+    glVertex3f(-1, -1, 1);
+    glVertex3f(1, -1, 1);
+    glVertex3f(1, -1, -1);
+    glVertex3f(-1, -1, -1);
 
     glEnd();
 }
@@ -91,7 +116,7 @@ void display() {
     glRotatef(angleY, 0, 1, 0);
     glRotatef(angleZ, 0, 0, 1);
 
-    drawCube();
+    draw();
     glutSwapBuffers();
 }
 
@@ -113,8 +138,19 @@ void update() {
     {
         playerBullets[i].update(deltaTime);
         //cout << fixed << setprecision(2) << "Bullet Position Y: " << playerBullets[i].pos.y << endl;
-        if (playerBullets[i].pos.y > 10.0f) {
+        if (playerBullets[i].pos.y > 1.0f) {
             playerBullets.erase(playerBullets.begin() + i);
+        }
+    }
+
+	// update enemies movement setiap detik
+	timeElapsed += deltaTime;
+
+    if (timeElapsed > 1) {
+		timeElapsed -= 1;
+        for (Enemy& enemy : enemies)
+        {
+            enemy.move();
         }
     }
 }
@@ -167,7 +203,7 @@ void keyboardSpecialDown(int key, int x, int y) {
     switch (key) {
     case GLUT_KEY_UP:
 		cout << "Fire!" << endl;
-		playerBullets.push_back(PlayerBullet(player.pos.toVector3()));
+		playerBullets.push_back(PlayerBullet(player.pos));
 		break;
     case GLUT_KEY_LEFT:
         player.isMovingLeft = true;
@@ -198,6 +234,8 @@ int main(int argc, char** argv) {
 
     glEnable(GL_DEPTH_TEST);
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+
+	initEnemies();
 
     glutDisplayFunc(display);
     glutIdleFunc(update);

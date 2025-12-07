@@ -2,9 +2,9 @@
 #include <glut.h>
 
 GameScreen::GameScreen() {
-	screenHeight = 1;
-	screenWidth = 1;
-	zOffset = 0.5f;
+	screenHeight = 2;
+	screenWidth = 2;
+	zOffset = 1.0f;
 	a = Vector3(-screenWidth / 2, screenHeight / 2, zOffset);
 	b = Vector3(screenWidth / 2, screenHeight / 2, zOffset);
 	c = Vector3(screenWidth / 2, -screenHeight / 2, zOffset);
