@@ -1,24 +1,23 @@
 #include "Player.h"
-#include "Vector2.h"
 #include "Vector3.h"
 #include <glut.h>
 
 Player::Player() {
+	float zOffset = 1.01f; // sedikit di depan game screen
 	health = 3;
 	isMovingLeft = false;
 	isMovingRight = false;
-	pos = Vector2(0.0f, 0.0f);
+	pos = Vector3(0.0f, -0.7f, zOffset);
 	width = 0.2f;
 	height = 0.1f;
 	moveSpeed = 1.0f;
-	zOffset = 0.51f; // sedikit di depan game screen
 }
 
 void Player::start() {
 	
 }
 
-void Player::update(Vector2 newPos) {
+void Player::update(Vector3 newPos) {
 	pos = newPos;
 }
 
@@ -49,15 +48,15 @@ void Player::draw() {
 	*	
 	*/
 	// Square Corners
-	Vector3 a = Vector3(pos.x - width / 2, pos.y + height / 2, zOffset);
-	Vector3 b = Vector3(pos.x + width / 2, pos.y + height / 2, zOffset);
-	Vector3 c = Vector3(pos.x + width / 2, pos.y - height / 2, zOffset);
-	Vector3 d = Vector3(pos.x - width / 2, pos.y - height / 2, zOffset);
+	Vector3 a = Vector3(pos.x - width / 2, pos.y + height / 2, pos.z);
+	Vector3 b = Vector3(pos.x + width / 2, pos.y + height / 2, pos.z);
+	Vector3 c = Vector3(pos.x + width / 2, pos.y - height / 2, pos.z);
+	Vector3 d = Vector3(pos.x - width / 2, pos.y - height / 2, pos.z);
 
 	
-	Vector3 pA = Vector3(pos.x, pos.y + height / 2 + width * 0.2, zOffset);
-	Vector3 pB = Vector3(pos.x + width * 0.1, pos.y + height / 2, zOffset);
-	Vector3 pC = Vector3(pos.x - width * 0.1, pos.y + height / 2, zOffset);
+	Vector3 pA = Vector3(pos.x, pos.y + height / 2 + width * 0.2, pos.z);
+	Vector3 pB = Vector3(pos.x + width * 0.1, pos.y + height / 2, pos.z);
+	Vector3 pC = Vector3(pos.x - width * 0.1, pos.y + height / 2, pos.z);
 
 
 	glBegin(GL_QUADS);

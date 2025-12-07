@@ -1,5 +1,5 @@
 #pragma once
-#include "Vector2.h"
+#include "Vector3.h"
 
 class Player {
 public:
@@ -7,18 +7,17 @@ public:
 	int health;
 	bool isMovingLeft;
 	bool isMovingRight;
-	Vector2 pos;
+	Vector3 pos;
 
 	// methods
 	void start();
-	void update(Vector2 newPos);
+	void update(Vector3 newPos);
 	void move(float deltaTime);
 	void draw();
 
 	// constructor
 	Player();
 private:
-	float zOffset; // untuk game screen 3d
 	float width;
 	float height;
 	float moveSpeed;
