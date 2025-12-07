@@ -10,7 +10,7 @@ Player::Player() {
 	pos = Vector2(0.0f, 0.0f);
 	width = 0.2f;
 	height = 0.1f;
-	moveSpeed = 0.001f;
+	moveSpeed = 1.0f;
 	zOffset = 0.51f; // sedikit di depan game screen
 }
 

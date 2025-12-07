@@ -2,7 +2,13 @@
 #include "Vector3.h"
 #include "GameScreen.h"
 #include "Player.h"
+#include "PlayerBullet.h"
 #include <glut.h>
+#include <vector>
+#include <iostream>
+#include <iomanip>
+
+using namespace std;
 
 float angleX = 0.0f;
 float angleY = 0.0f;
@@ -10,6 +16,7 @@ float angleZ = 0.0f;
 
 GameScreen gameScreen;
 Player player;
+vector<PlayerBullet> playerBullets; 
 
 float deltaTime = 0.0f;
 float oldTimeSinceStart = 0.0f;
@@ -17,6 +24,12 @@ float oldTimeSinceStart = 0.0f;
 void drawCube() {
 	gameScreen.draw();
 	player.draw();
+    if (!playerBullets.empty()) {
+        for (PlayerBullet& pb : playerBullets)
+        {
+            pb.draw();
+        }
+    }
 
     glBegin(GL_QUADS);
 
@@ -84,15 +97,28 @@ void display() {
 
 void updateDeltaTime() {
     float timeSinceStart = glutGet(GLUT_ELAPSED_TIME);
-    deltaTime = timeSinceStart - oldTimeSinceStart;
+    deltaTime = (timeSinceStart - oldTimeSinceStart) / 1000.0f;
     oldTimeSinceStart = timeSinceStart;
 }
 
 void update() {
-	glutPostRedisplay();
-	updateDeltaTime();
-	player.move(deltaTime);
+    glutPostRedisplay();
+    updateDeltaTime();
+
+    // update player
+    player.move(deltaTime);
+
+    // update player bullets (kalo ada)
+    for (int i = playerBullets.size() - 1; i >= 0; --i)
+    {
+        playerBullets[i].update(deltaTime);
+        //cout << fixed << setprecision(2) << "Bullet Position Y: " << playerBullets[i].pos.y << endl;
+        if (playerBullets[i].pos.y > 10.0f) {
+            playerBullets.erase(playerBullets.begin() + i);
+        }
+    }
 }
+
 
 // Fungsi menangani ukuran window
 void reshape(int width, int height) {
@@ -139,6 +165,10 @@ void keyboardUp(unsigned char key, int x, int y) {
 
 void keyboardSpecialDown(int key, int x, int y) {
     switch (key) {
+    case GLUT_KEY_UP:
+		cout << "Fire!" << endl;
+		playerBullets.push_back(PlayerBullet(player.pos.toVector3()));
+		break;
     case GLUT_KEY_LEFT:
         player.isMovingLeft = true;
         break;

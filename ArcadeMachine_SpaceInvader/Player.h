@@ -7,6 +7,7 @@ public:
 	int health;
 	bool isMovingLeft;
 	bool isMovingRight;
+	Vector2 pos;
 
 	// methods
 	void start();
@@ -17,7 +18,6 @@ public:
 	// constructor
 	Player();
 private:
-	Vector2 pos;
 	float zOffset; // untuk game screen 3d
 	float width;
 	float height;
