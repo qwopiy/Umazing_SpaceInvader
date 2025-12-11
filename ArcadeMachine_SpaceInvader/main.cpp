@@ -1,14 +1,254 @@
-#include "Vector3.h"
-#include "GameScreen.h"
-#include "Player.h"
-#include "PlayerBullet.h"
-#include "Enemy.h"
 #include <glut.h>
 #include <vector>
 #include <iostream>
 #include <iomanip>
 
 using namespace std;
+
+struct Vector3 {
+    float x;
+    float y;
+    float z;
+
+    void toGLVertex2f() {
+        glVertex2f(this->x, this->y);
+    };
+
+    void toGLVertex3f() {
+		glVertex3f(this->x, this->y, this->z);
+    };
+
+    void Vertex2f(Vector3 v) {
+        glVertex2f(v.x, v.y);
+    };
+
+    void Vertex3f(Vector3 v) {
+        glVertex3f(v.x, v.y, v.z);
+    };
+
+    Vector3(float x, float y, float z) {
+        this->x = x;
+        this->y = y;
+        this->z = z;
+    };
+    Vector3(int x, int y, int z) {
+		this->x = static_cast<float>(x);
+		this->y = static_cast<float>(y);
+		this->z = static_cast<float>(z);
+    };
+    Vector3() {
+        this->x = 0.0f;
+        this->y = 0.0f;
+        this->z = 0.0f;
+    };
+};
+
+class Enemy {
+public:
+    Vector3 pos;
+    Vector3 a;
+    Vector3 b;
+    Vector3 c;
+    Vector3 d;
+
+    void move() {
+        pos.x += movespeed * direction;
+
+        if (pos.x > startPos.x + moveAmplitude) {
+            direction = -1.0f;
+            pos.y -= 0.1f;
+        }
+        else if (pos.x < startPos.x) {
+            direction = 1.0f;
+            pos.y -= 0.1f;
+        }
+
+        a = { (pos.x - width / 2), (pos.y + height / 2), pos.z };
+        b = { (pos.x + width / 2), (pos.y + height / 2), pos.z };
+        c = { (pos.x + width / 2), (pos.y - height / 2), pos.z };
+        d = { (pos.x - width / 2), (pos.y - height / 2), pos.z };
+    };
+
+    void draw() {
+        glBegin(GL_QUADS);
+        glColor3f(1, 1, 1);
+        a.toGLVertex3f();
+        b.toGLVertex3f();
+        c.toGLVertex3f();
+        d.toGLVertex3f();
+        glEnd();
+    };
+    void die();
+
+    Enemy(Vector3 startPos, float width, float height) {
+        this->startPos = startPos;
+        pos = startPos;
+        this->width = width;
+        this->height = height;
+
+        moveAmplitude = 0.5f;
+        movespeed = 0.02f;
+        direction = 1.0f;
+        a = { (pos.x - width / 2), (pos.y + height / 2), pos.z };
+        b = { (pos.x + width / 2), (pos.y + height / 2), pos.z };
+        c = { (pos.x + width / 2), (pos.y - height / 2), pos.z };
+        d = { (pos.x - width / 2), (pos.y - height / 2), pos.z };
+    };
+
+private:
+    Vector3 startPos;
+    float width;
+    float height;
+    float moveAmplitude;
+    float movespeed;
+    float direction;
+};
+
+class GameScreen {
+public:
+    // attributes
+    float screenHeight;
+    float screenWidth;
+    float zOffset;
+
+    // methods
+    void draw() {
+        glBegin(GL_QUADS);
+
+        glColor3f(0, 0, 0);
+        a.toGLVertex3f();
+        b.toGLVertex3f();
+        c.toGLVertex3f();
+        d.toGLVertex3f();
+        glEnd();
+    };
+
+    // constructor
+    GameScreen() {
+        screenHeight = 2;
+        screenWidth = 2;
+        zOffset = 1.0f;
+        a = Vector3(-screenWidth / 2, screenHeight / 2, zOffset);
+        b = Vector3(screenWidth / 2, screenHeight / 2, zOffset);
+        c = Vector3(screenWidth / 2, -screenHeight / 2, zOffset);
+        d = Vector3(-screenWidth / 2, -screenHeight / 2, zOffset);
+    };
+private:
+    // Screen corners
+    Vector3 a;
+    Vector3 b;
+    Vector3 c;
+    Vector3 d;
+};
+
+class Player {
+public:
+    // attributes
+    int health;
+    bool isMovingLeft;
+    bool isMovingRight;
+    Vector3 pos;
+
+    // methods
+    void start();
+    void update(Vector3 newPos) {
+        pos = newPos;
+    };
+    void move(float deltaTime) {
+        if (isMovingLeft && isMovingRight) {
+            return;
+        }
+        if (isMovingLeft) {
+            pos.x -= moveSpeed * deltaTime;
+        }
+        if (isMovingRight) {
+            pos.x += moveSpeed * deltaTime;
+        }
+    };
+    void draw() {
+        /*
+        *
+        *	 bentuk Tanknya
+        *
+        *			 pA
+        *			/  \
+        *	a-----pC----pB-----b
+        *	|				   |
+        *	|				   |
+        *	d------------------c
+        *
+        *
+        */
+        // Square Corners
+        Vector3 a = Vector3(pos.x - width / 2, pos.y + height / 2, pos.z);
+        Vector3 b = Vector3(pos.x + width / 2, pos.y + height / 2, pos.z);
+        Vector3 c = Vector3(pos.x + width / 2, pos.y - height / 2, pos.z);
+        Vector3 d = Vector3(pos.x - width / 2, pos.y - height / 2, pos.z);
+
+
+        Vector3 pA = Vector3(pos.x, pos.y + height / 2 + width * 0.2, pos.z);
+        Vector3 pB = Vector3(pos.x + width * 0.1, pos.y + height / 2, pos.z);
+        Vector3 pC = Vector3(pos.x - width * 0.1, pos.y + height / 2, pos.z);
+
+
+        glBegin(GL_QUADS);
+        glColor3f(0, 1, 0);
+        a.toGLVertex3f();
+        b.toGLVertex3f();
+        c.toGLVertex3f();
+        d.toGLVertex3f();
+        glEnd();
+
+        glBegin(GL_TRIANGLES);
+        glColor3f(0, 1, 0);
+        pA.toGLVertex3f();
+        pB.toGLVertex3f();
+        pC.toGLVertex3f();
+        glEnd();
+    };
+
+    // constructor
+    Player() {
+        float zOffset = 1.01f; // sedikit di depan game screen
+        health = 3;
+        isMovingLeft = false;
+        isMovingRight = false;
+        pos = Vector3(0.0f, -0.7f, zOffset);
+        width = 0.2f;
+        height = 0.1f;
+        moveSpeed = 1.0f;
+    };
+private:
+    float width;
+    float height;
+    float moveSpeed;
+};
+
+class PlayerBullet {
+public:
+    Vector3 pos;
+
+    void update(float deltaTime) {
+        pos.y += moveSpeed * deltaTime;
+    };
+
+    void draw() {
+        glBegin(GL_QUADS);
+        glColor3f(0, 1, 0);
+        glVertex3f(pos.x - 0.01f, pos.y + 0.02f, pos.z + 0.1f);
+        glVertex3f(pos.x + 0.01f, pos.y + 0.02f, pos.z + 0.1f);
+        glVertex3f(pos.x + 0.01f, pos.y - 0.02f, pos.z + 0.1f);
+        glVertex3f(pos.x - 0.01f, pos.y - 0.02f, pos.z + 0.1f);
+        glEnd();
+    };
+
+    PlayerBullet(Vector3 playerPos) {
+        pos = playerPos;
+        moveSpeed = 1.0f;
+    };
+private:
+    float moveSpeed;
+};
 
 float angleX = 0.0f;
 float angleY = 0.0f;
