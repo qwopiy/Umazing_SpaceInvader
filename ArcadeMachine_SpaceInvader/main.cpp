@@ -43,6 +43,37 @@ struct Vector3 {
     };
 };
 
+class Explosion {
+public: 
+	Vector3 pos;
+	float duration;
+	float elapsedTime;
+	void update(float deltaTime) {
+		radius += 0.1f * deltaTime;
+		elapsedTime += deltaTime;
+	};
+	void draw() {
+		// Draw explosion effect (placeholder)
+		glBegin(GL_POLYGON);
+		glColor3f(1, 0.5f, 0);
+		int numSegments = 100;
+		for (int i = 0; i < numSegments; ++i) {
+			float theta = 2.0f * 3.1415926f * float(i) / float(numSegments);
+			float dx = radius * cosf(theta);
+			float dy = radius * sinf(theta);
+			glVertex3f(pos.x + dx, pos.y + dy, pos.z);
+		}
+		glEnd();
+	};
+	Explosion(Vector3 position, float duration) {
+		this->pos = Vector3(position.x, position.y, position.z + 0.01f);
+		this->duration = duration;
+		this->elapsedTime = 0.0f;
+	};
+private:
+    float radius = 0.0f;
+};
+
 class Enemy {
 public:
     Vector3 pos;
@@ -78,7 +109,6 @@ public:
         d.toGLVertex3f();
         glEnd();
     };
-    void die();
 
     Enemy(Vector3 startPos, float width, float height) {
         this->startPos = startPos;
@@ -228,17 +258,17 @@ class PlayerBullet {
 public:
     Vector3 pos;
 
-    void update(float deltaTime) {
-        pos.y += moveSpeed * deltaTime;
-    };
+    void update(float deltaTime) {  
+       pos.y += moveSpeed * deltaTime;  
+    }
 
     void draw() {
         glBegin(GL_QUADS);
         glColor3f(0, 1, 0);
-        glVertex3f(pos.x - 0.01f, pos.y + 0.02f, pos.z + 0.1f);
-        glVertex3f(pos.x + 0.01f, pos.y + 0.02f, pos.z + 0.1f);
-        glVertex3f(pos.x + 0.01f, pos.y - 0.02f, pos.z + 0.1f);
-        glVertex3f(pos.x - 0.01f, pos.y - 0.02f, pos.z + 0.1f);
+        glVertex3f(pos.x - 0.01f, pos.y + 0.02f, pos.z);
+        glVertex3f(pos.x + 0.01f, pos.y + 0.02f, pos.z);
+        glVertex3f(pos.x + 0.01f, pos.y - 0.02f, pos.z);
+        glVertex3f(pos.x - 0.01f, pos.y - 0.02f, pos.z);
         glEnd();
     };
 
@@ -258,6 +288,7 @@ GameScreen gameScreen;
 Player player;
 vector<PlayerBullet> playerBullets; 
 vector<Enemy> enemies;
+vector<Explosion> explosions;
 
 float deltaTime = 0.0f;
 float oldTimeSinceStart = 0.0f;
@@ -294,6 +325,12 @@ void draw() {
             enemy.draw();
         }
     }
+	if (!explosions.empty()) {
+		for (Explosion& explosion : explosions)
+		{
+			explosion.draw();
+		}
+	}
 
     glBegin(GL_QUADS);
 
@@ -594,16 +631,6 @@ void update() {
     // update player
     player.move(deltaTime);
 
-    // update player bullets (kalo ada)
-    for (int i = playerBullets.size() - 1; i >= 0; --i)
-    {
-        playerBullets[i].update(deltaTime);
-        //cout << fixed << setprecision(2) << "Bullet Position Y: " << playerBullets[i].pos.y << endl;
-        if (playerBullets[i].pos.y > 1.0f) {
-            playerBullets.erase(playerBullets.begin() + i);
-        }
-    }
-
 	// update enemies movement setiap detik
 	timeElapsed += deltaTime;
 
@@ -614,6 +641,43 @@ void update() {
             enemy.move();
         }
     }
+
+	// update bullets
+    for (int i = playerBullets.size() - 1; i >= 0; --i) {
+        playerBullets[i].update(deltaTime);
+
+        // bullet max range
+        if (playerBullets[i].pos.y > 1.0f) {
+            playerBullets.erase(playerBullets.begin() + i);
+            continue;
+        }
+
+        // Check collision dengan enemies
+        bool bulletHit = false;
+        for (int j = enemies.size() - 1; j >= 0; --j) {
+            Enemy& e = enemies[j];
+            // AABB collision
+            if (playerBullets[i].pos.x > e.a.x && playerBullets[i].pos.x < e.b.x &&
+                playerBullets[i].pos.y < e.a.y && playerBullets[i].pos.y > e.d.y) {
+				// Create explosion
+				explosions.push_back(Explosion(e.pos, 0.5f));
+                // Remove enemy and bullet
+                enemies.erase(enemies.begin() + j);
+                playerBullets.erase(playerBullets.begin() + i);
+                bulletHit = true;
+                break;
+            }
+        }
+        if (bulletHit) continue; 
+    }
+
+	// update explosions
+	for (int i = explosions.size() - 1; i >= 0; --i) {
+		explosions[i].update(deltaTime);
+		if (explosions[i].elapsedTime > explosions[i].duration) {
+			explosions.erase(explosions.begin() + i);
+		}
+	}
 }
 
 
