@@ -184,14 +184,14 @@ public:
     void update(Vector3 newPos) {
         pos = newPos;
     };
-    void move(float deltaTime) {
+    void move(float deltaTime, GameScreen gr) {
         if (isMovingLeft && isMovingRight) {
             return;
         }
-        if (isMovingLeft) {
+        if (isMovingLeft && pos.x > -gr.screenWidth / 2 + width / 2) {
             pos.x -= moveSpeed * deltaTime;
         }
-        if (isMovingRight) {
+        if (isMovingRight && pos.x < gr.screenWidth / 2 - width / 2) {
             pos.x += moveSpeed * deltaTime;
         }
     };
@@ -629,7 +629,7 @@ void update() {
     updateDeltaTime();
 
     // update player
-    player.move(deltaTime);
+    player.move(deltaTime, gameScreen);
 
 	// update enemies movement setiap detik
 	timeElapsed += deltaTime;
