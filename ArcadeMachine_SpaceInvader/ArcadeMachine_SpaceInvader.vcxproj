@@ -137,12 +137,24 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Enemy.cpp" />
-    <ClCompile Include="GameScreen.cpp" />
-    <ClCompile Include="Player.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="PlayerBullet.cpp" />
-    <ClCompile Include="Vector3.cpp" />
+    <ClCompile Include="Enemy.cpp">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">C:\Grafika_Komputer_6\freeglut</AdditionalIncludeDirectories>
+    </ClCompile>
+    <ClCompile Include="GameScreen.cpp">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">C:\Grafika_Komputer_6\freeglut</AdditionalIncludeDirectories>
+    </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">C:\Grafika_Komputer_6\freeglut</AdditionalIncludeDirectories>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">C:\Grafika_Komputer_6\freeglut</AdditionalIncludeDirectories>
+    </ClCompile>
+    <ClCompile Include="PlayerBullet.cpp">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">C:\Grafika_Komputer_6\freeglut</AdditionalIncludeDirectories>
+    </ClCompile>
+    <ClCompile Include="Vector3.cpp">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">C:\Grafika_Komputer_6\freeglut</AdditionalIncludeDirectories>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Enemy.h" />
