@@ -94,10 +94,25 @@ public:
             pos.y -= 0.1f;
         }
 
-        a = { (pos.x - width / 2), (pos.y + height / 2), pos.z };
-        b = { (pos.x + width / 2), (pos.y + height / 2), pos.z };
-        c = { (pos.x + width / 2), (pos.y - height / 2), pos.z };
-        d = { (pos.x - width / 2), (pos.y - height / 2), pos.z };
+        a = { (pos.x - topWidth / 2), (pos.y + height / 2), pos.z };
+        b = { (pos.x + topWidth / 2), (pos.y + height / 2), pos.z };
+        c = { (pos.x + bottomWidth / 2), (pos.y - height / 2), pos.z };
+        d = { (pos.x - bottomWidth / 2), (pos.y - height / 2), pos.z };
+
+		if (topWidth >= (bottomWidth + morphMagnitude)) {
+			isExpanding = false;
+		}
+		else if (topWidth <= (bottomWidth - morphMagnitude)) {
+			isExpanding = true;
+		}
+
+        if (isExpanding) {
+			topWidth += 0.01f;
+		}
+        else if (!isExpanding) {
+            topWidth -= 0.01f;
+        }
+
     };
 
     void draw() {
@@ -113,25 +128,31 @@ public:
     Enemy(Vector3 startPos, float width, float height) {
         this->startPos = startPos;
         pos = startPos;
-        this->width = width;
+        this->topWidth = width;
+		this->bottomWidth = width;
         this->height = height;
 
+		isExpanding = true;
+		morphMagnitude = 0.05f;
         moveAmplitude = 0.5f;
         movespeed = 0.02f;
         direction = 1.0f;
-        a = { (pos.x - width / 2), (pos.y + height / 2), pos.z };
-        b = { (pos.x + width / 2), (pos.y + height / 2), pos.z };
-        c = { (pos.x + width / 2), (pos.y - height / 2), pos.z };
-        d = { (pos.x - width / 2), (pos.y - height / 2), pos.z };
+        a = { (pos.x - topWidth / 2), (pos.y + height / 2), pos.z };
+        b = { (pos.x + topWidth / 2), (pos.y + height / 2), pos.z };
+        c = { (pos.x + bottomWidth / 2), (pos.y - height / 2), pos.z };
+        d = { (pos.x - bottomWidth / 2), (pos.y - height / 2), pos.z };
     };
 
 private:
     Vector3 startPos;
-    float width;
     float height;
     float moveAmplitude;
     float movespeed;
     float direction;
+    float morphMagnitude;
+    float topWidth;
+	float bottomWidth;
+    bool isExpanding;
 };
 
 class GameScreen {
@@ -283,6 +304,7 @@ private:
 float angleX = 0.0f;
 float angleY = 0.0f;
 float angleZ = 0.0f;
+float zoom = 9.0f;
 
 GameScreen gameScreen;
 Player player;
@@ -605,7 +627,7 @@ void display() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
 
-    gluLookAt(0, 0, 9,// Posisi kamera. eye X, eye Y, eye Z.
+    gluLookAt(0, 0, zoom,// Posisi kamera. eye X, eye Y, eye Z.
         0, 0, 0,  // Titik fokus kamera
         0, 1, 0); // Vektor "up" kamera
 
@@ -706,19 +728,8 @@ void keyboardDown(unsigned char key, int x, int y) {
     case 'd': angleY += 5.0f; break;
     case 'q': angleZ -= 5.0f; break;
     case 'e': angleZ += 5.0f; break;
-    case 27: exit(0); break;
-    }
-    glutPostRedisplay();
-}
-
-void keyboardUp(unsigned char key, int x, int y) {
-    switch (key) {
-    case 'w': angleX -= 5.0f; break;
-    case 's': angleX += 5.0f; break;
-    case 'a': angleY -= 5.0f; break;
-    case 'd': angleY += 5.0f; break;
-    case 'q': angleZ -= 5.0f; break;
-    case 'e': angleZ += 5.0f; break;
+	case 'z': zoom -= 0.5f; break;
+	case 'x': zoom += 0.5f; break;
     case 27: exit(0); break;
     }
     glutPostRedisplay();
